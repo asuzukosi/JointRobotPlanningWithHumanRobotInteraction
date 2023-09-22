@@ -1,0 +1,12 @@
+numpy
+pyrealsense2 # only works on x86 based systems
+opencv-python
+torch
+pillow
+transformers
+datasets
+evaluate
+timm
+albumentations
+sentencepiece
+gguf
