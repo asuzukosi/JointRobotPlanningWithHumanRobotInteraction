@@ -6,3 +6,4 @@ cppe5
 llama.cpp/
 *.bin
 *.jpg
+.vscode

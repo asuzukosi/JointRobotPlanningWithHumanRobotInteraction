@@ -447,6 +447,10 @@ robot2.get_hardware_status()
 # Also what is a robot workspace
 
 
+# The pose to pixel problem is a ratio problem, we need to ratio the real world pose valuest to the equivalent pixel values
+
+# We would also need to account for the horizontal and vertical offset from the pixel images
+
 
 
 

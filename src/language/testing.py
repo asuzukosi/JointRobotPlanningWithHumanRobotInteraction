@@ -7,7 +7,7 @@ def load_llm():
 
 def llm_response(prompt):
     llm = load_llm()
-    llm_pipeline = llm(prompt, max_tokens=1000, temperature=0.3)
+    llm_pipeline = llm(prompt, max_tokens=1000, temperature=0.4)
     text_from_choices = llm_pipeline['choices'][0]['text']
     return text_from_choices
 
