@@ -7,3 +7,5 @@ llama.cpp/
 *.bin
 *.jpg
 .vscode
+robotiq*
+robotiq_2f_85/
