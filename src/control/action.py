@@ -1,6 +1,7 @@
 import pyniryo
 import numpy
 import cv2
+import time
 # if you are connected to the robot through the robot's hotspot this is the 
 # default ip address for the hotspot connection
 # although we need to explore the possibility of connecting the robot to a shared network
@@ -55,7 +56,8 @@ def turn_gray(image):
     gray = cv2.medianBlur(gray,5)
     
     return gray
-    
+
+# this is better suited to detect static object that enter into a scene and stay fixed
 def absolute_difference_background_subtraction(base_frame, current_frame):
     """
     Calculate the absolute difference between the current video frame
@@ -115,12 +117,77 @@ def absolute_difference_background_subtraction(base_frame, current_frame):
         # cv2.imshow("Frame",current_frame)
     return True, centroids
 
-
-def background_subtractor_mog2():
-    # another algorithm for background subtraction
-    # TODO: 
+def calculate_pick_position_givne_bounded_box(x, y, width, height):
+    # Given a set of bounding box parameters determine the 
+    # exact center point or pick location of the object
     pass
- 
+
+# this is more compulationally intensive that absolute substraction
+# but it hanldes shadows and noise better
+# This is better suited for moving objects
+def background_subtractor_mog2(base_frame, current_frame):
+    # This algorithm detects objects in a video stream
+    # using the Gaussian Mixture Model background subtraction method
+    bg_subtractor = cv2.BackgroundSubtractorMOG2(history=150,
+                                                 varThreshold=25, detectShadows=True)
+    time.sleep(0.1)
+    # Create kernel for morphological operation. You can tweak
+    # the dimensions of the kernel.
+    # e.g. instead of 20, 20, you can try 30, 30
+    kernel = numpy.ones((20,20),numpy.uint8)
+    
+    # Convert to foreground mask
+    fg_mask = bg_subtractor.apply(current_frame)
+     
+    # Close gaps using closing
+    fg_mask = cv2.morphologyEx(fg_mask,cv2.MORPH_CLOSE,kernel)
+       
+    # Remove salt and pepper noise with a median filter
+    fg_mask = cv2.medianBlur(fg_mask,5)
+    
+    # If a pixel is less than ##, it is considered black (background). 
+    # Otherwise, it is white (foreground). 255 is upper limit.
+    # Modify the number after fg_mask as you see fit.
+    _, fg_mask = cv2.threshold(fg_mask, 
+                               127, 255, 
+                               cv2.THRESH_BINARY)
+    # Find the contours of the object inside the binary image
+    contours, hierarchy = cv2.findContours(fg_mask,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)[-2:]
+    areas = [cv2.contourArea(c) for c in contours]
+    
+     # if there are no moving objects then return none
+    if len(areas) < 1:
+        # no new objects were found in the image
+        return False, []
+    
+    # get the list of all the center points of the contour objects
+    centroids = []
+    for index in range(len(contours)):
+    
+        # Draw the bounding box
+        cnt = contours[index]
+        x,y,w,h = cv2.boundingRect(cnt)
+        cv2.rectangle(current_frame,(x,y),(x+w,y+h),(0,255,0),3)
+        
+        # get the center points of the image
+        # Draw circle in the center of the bounding box
+        center_x = x + int(w/2)
+        center_y = y + int(h/2)
+        centroids.append((center_x, center_y))
+        
+        # OPTIONAL
+        # cv2.circle(current_frame,(x2,y2),4,(0,255,0),-1)
+        
+        # # Print the centroid coordinates (we'll use the center of the
+        # # bounding box) on the image
+        # text = "x: " + str(x2) + ", y: " + str(y2)
+        # cv2.putText(current_frame, text, (x2 - 10, y2 - 10),
+        # cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+            
+        # # Display the resulting frame
+        # cv2.imshow("Frame",current_frame)
+    return True, centroids
+  
 
 def find_obj_location(image: numpy.ndarray):
     """
