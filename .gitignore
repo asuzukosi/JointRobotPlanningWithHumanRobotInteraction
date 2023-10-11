@@ -8,4 +8,6 @@ llama.cpp/
 *.jpg
 .vscode
 robotiq*
-robotiq_2f_85/
+/robotiq_2f_85/
+robotiq_2f_85*
+image_path_v2

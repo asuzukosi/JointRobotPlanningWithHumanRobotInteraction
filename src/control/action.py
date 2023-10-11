@@ -240,3 +240,6 @@ class Test:
 # t = Test()
 
 # image = capture_image()
+
+# Converting pixel coordinates to coordinates 
+# relative to the robot baseframe
