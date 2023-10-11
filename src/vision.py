@@ -11,6 +11,7 @@ from PIL import Image
 import collections
 import matplotlib.pyplot as plt
 import tensorflow.compat.v1 as tf
+import time
 
 
 def load_clip_model(model_name="ViT-B/32"):
@@ -611,7 +612,6 @@ def display_image(path_or_array, size=(10, 10)):
     plt.axis("off")
     plt.show()
     
-    
 def vild(image_path, category_name_string, params, plot_on=True, prompt_swaps=[]):
     #################################################################
     # the function takes in a static image path saved in the local directory
@@ -723,7 +723,10 @@ def vild(image_path, category_name_string, params, plot_on=True, prompt_swaps=[]
         if found_object == "background":
             continue
         # print("Found a", found_object, "with score:", np.max(scores))
-        found_objects.append({"name": found_object, "score": np.max(scores), "bbox": proccessed_box})
+        found_objects.append({"name": found_object, "score": np.max(scores), "bbox": proccessed_box, "center_point": calculate_center_point(proccessed_box[0],
+                                                                                                                                            proccessed_box[1],
+                                                                                                                                            proccessed_box[2],
+                                                                                                                                            proccessed_box[3])})
     if not plot_on:
         return found_objects
 
@@ -733,5 +736,113 @@ def calculate_center_point(x, y, w, h):
     center_y = y + int(h/2)
     return (center_x, center_y)
 
-def getItemsInScene(image):
-    pass
+
+def findObjectInScene(image, target_object=None):
+    """
+    Given an image and a target object it 
+    finds all the instances of the target object in the scene
+    """
+    category_names = ['blue block',
+                  'red block',
+                  'green block',
+                  'orange block',
+                  'yellow block',
+                  'purple block',
+                  'pink block',
+                  'cyan block',
+                  'brown block',
+                  'gray block',
+
+                  'blue bowl',
+                  'red bowl',
+                  'green bowl',
+                  'orange bowl',
+                  'yellow bowl',
+                  'purple bowl',
+                  'pink bowl',
+                  'cyan bowl',
+                  'brown bowl',
+                  'gray bowl']
+    
+    image_path = "liveimage.jpg"
+    try:
+        cv2.imwrite(image_path, image)
+    except Exception as e:
+        return f"Failed to save image to {image_path} with exception {e}"
+    
+    category_name_string = ";".join(category_names)
+    max_boxes_to_draw = 8 #@param {type:"integer"}
+
+    # Extra prompt engineering: swap A with B for every (A, B) in list.
+    prompt_swaps = [('block', 'cube')]
+
+    nms_threshold = 0.4
+    min_rpn_score_thresh = 0.4
+    min_box_area = 10
+    max_box_area = 3000
+    vild_params = max_boxes_to_draw, nms_threshold, min_rpn_score_thresh, min_box_area, max_box_area
+    found_objects = vild(image_path, category_name_string, vild_params, plot_on=True, prompt_swaps=prompt_swaps)
+    if not target_object:
+        return found_objects
+    matching_objects = []
+    for obj in found_objects:
+        if obj["name"] == target_object:
+            matching_objects.append(obj)
+    return matching_objects
+
+
+def build_scene_description(image):
+    """
+    The scene is composed only of blocks and bowls
+    The scene description is going to use the information the camera observation
+    and predifined objects to build a description of what is happening in the scene
+    """
+    
+    scene_description = ""
+    found_objects = findObjectInScene(image)
+    objects = [ found_object["name"] for found_object in found_objects]
+    if len(objects) == 0:
+        scene_description += "The scene is empty, there are no blocks or bowls. \n"
+        return scene_description
+    blocks = [ o.split(" ")[0] for o in objects if o.split(" ")[1] == "block"]
+    scene_description += f"There are {len(blocks)} blocks in the scene \n"
+    block_map = {}
+    for i in blocks:
+        if i in block_map:
+            block_map[i] += 1
+        else:
+            block_map[i] = 1
+    for key, value in block_map.items():
+        plural = ""
+        if value > 1:
+            plural = "s"
+        scene_description += f" {value} {key} block{plural} \n"
+    
+    bowls = [ o for o in objects if o.split(" ")[1] == "bowl"]
+    
+    scene_description += f"There are {len(bowls)} bowls in the scene \n"
+    bowl_map = {}
+    for i in bowls:
+        if i in bowl_map:
+            bowl_map[i] += 1
+        else:
+            bowl_map[i] = 1
+    for key, value in block_map.items():
+        plural = ""
+        if value > 1:
+            plural = "s"
+        scene_description += f" {value} {key} bowl{plural} \n"
+        
+    return scene_description
+
+
+def getObjectLocation(object):
+    
+    
+    
+    
+    
+    
+    
+    
+    
