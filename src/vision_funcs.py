@@ -12,6 +12,8 @@ import collections
 import matplotlib.pyplot as plt
 import tensorflow.compat.v1 as tf
 import time
+from vision.intelrealsensecamera import get_camera_image
+from dataclasses import dataclass
 
 
 def load_clip_model(model_name="ViT-B/32"):
@@ -791,13 +793,13 @@ def findObjectInScene(image, target_object=None):
     return matching_objects
 
 
-def build_scene_description(image):
+def build_scene_description():
     """
     The scene is composed only of blocks and bowls
     The scene description is going to use the information the camera observation
     and predifined objects to build a description of what is happening in the scene
     """
-    
+    image, _ = get_camera_image()
     scene_description = ""
     found_objects = findObjectInScene(image)
     objects = [ found_object["name"] for found_object in found_objects]
@@ -835,8 +837,34 @@ def build_scene_description(image):
         
     return scene_description
 
+@dataclass
+class Location:
+    x: float
+    y: float
 
-def getObjectLocation(object):
+
+def getObjectLocation(target_object):
+    image, _ = get_camera_image()
+    item = findObjectInScene(image, target_object)
+    if len(item) == 0:
+        print(f"**No {target_object} found**")
+        return None
+    cp =  item[0]["center_point"]
+    return Location(x=cp[0], y=cp[1])
+
+def getAllObjectLocation(*args):
+    all_items = []
+    image, _ = get_camera_image()
+    for arg in args:
+        items = findObjectInScene(image, arg)
+        if len(items) == 0:
+            continue
+        else:
+            cps = [i["center_point"] for i in items]
+            cps = [Location(x=cp[0], y=cp[1]) for cp in cps]
+            all_items += cps
+    return all_items
+    
     
     
     
