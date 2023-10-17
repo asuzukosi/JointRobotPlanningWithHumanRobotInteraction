@@ -3,8 +3,8 @@ import pyniryo
 import time
 from typing import List
 
-NAGA_AI_BASE = "https://api.naga.ac/v1"
-NAGA_AI_KEY = "VN7eDdNzbkQkrmEmIr1Gj1Kci3Ed_g6a_atrW14jq6c"
+NAGA_AI_BASE = ""
+NAGA_AI_KEY = ""
 
 openai.api_base = NAGA_AI_BASE
 openai.api_key = NAGA_AI_KEY
