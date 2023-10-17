@@ -11,3 +11,5 @@ robotiq*
 /robotiq_2f_85/
 robotiq_2f_85*
 image_path_v2
+/__pycache__/
+__pycache__/
