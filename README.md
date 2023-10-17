@@ -150,12 +150,5 @@ Thank you for using the LLMs for Robot Planning project. If you have any questio
 
 [GitHub Repository](https://github.com/your-username/robot-planning-llm)
 
----
 
-*Note: Replace "asuzukosi" with the actual GitHub repository URL if applicable.*
-)
-
----
-
-*Note: Replace "your-username" with the actual GitHub repository URL if applicable.*
 
