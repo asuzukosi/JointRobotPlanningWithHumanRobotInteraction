@@ -3,8 +3,8 @@ import pyniryo
 import time
 from typing import List
 
-NAGA_AI_BASE = ""
-NAGA_AI_KEY = ""
+NAGA_AI_BASE =  "https://api.naga.ac/v1"
+NAGA_AI_KEY = "VN7eDdNzbkQkrmEmIr1Gj1Kci3Ed_g6a_atrW14jq6c"
 
 openai.api_base = NAGA_AI_BASE
 openai.api_key = NAGA_AI_KEY
@@ -188,6 +188,19 @@ def getRobotPoseFromPixelValues(pixel_x, pixel_y):
     
 #     Robot.move_to_home_pose()
 #     time.sleep(3)
+
+from llama_cpp import Llama
+MODEL_PATH = "codellama-7b-instruct.Q2_K.gguf"
+
+def load_llm():
+    llm = Llama(model_path=MODEL_PATH, n_ctx=2048)
+    return llm
+
+def llm_response(prompt):
+    llm = load_llm()
+    llm_pipeline = llm(prompt, max_tokens=1000, temperature=0)
+    text_from_choices = llm_pipeline['choices'][0]['text']
+    return text_from_choices
     
 
 def prepare_prompt(command, scene_description=None):
@@ -211,6 +224,12 @@ def generate_response(prompt, additional_messages=[]):
     )
     result = response["choices"][0]["message"]["content"]
     return result
+    # llm = load_llm()
+    # llm_pipeline = llm(prompt, max_tokens=1000, temperature=0.4)
+    # text_from_choices = llm_pipeline['choices'][0]['text']
+    # prompt_index = text_from_choices.find("Scene")
+    # text_from_choices = text_from_choices[:prompt_index]
+    # return text_from_choices
     
 while True:
     command = input("Enter robot command: ")
