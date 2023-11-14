@@ -600,7 +600,7 @@ gpu_options
 
 
 session = tf.Session(graph=tf.Graph(), config=tf.ConfigProto(gpu_options=gpu_options))
-saved_model_dir = "/Users/kosisochukwuasuzu/Developer/machine_learning/llm-robotics/src/image_path_v2"
+saved_model_dir = "/home/robotics/PythonProject/ned_lang/src/image_path_v2"
 _ = tf.saved_model.loader.load(session, ["serve"], saved_model_dir)
 
 def display_image(path_or_array, size=(10, 10)):
@@ -731,6 +731,7 @@ def vild(image_path, category_name_string, params, plot_on=True, prompt_swaps=[]
                                                                                                                                             proccessed_box[3])})
     if not plot_on:
         return found_objects
+    return found_objects
 
 def calculate_center_point(x, y, w, h):
     # Calculate the center point given teh bounding box values
@@ -771,6 +772,7 @@ def findObjectInScene(image, target_object=None):
         cv2.imwrite(image_path, image)
     except Exception as e:
         return f"Failed to save image to {image_path} with exception {e}"
+
     
     category_name_string = ";".join(category_names)
     max_boxes_to_draw = 8 #@param {type:"integer"}
@@ -802,6 +804,7 @@ def build_scene_description():
     image, _ = get_camera_image()
     scene_description = ""
     found_objects = findObjectInScene(image)
+    print(found_objects)
     objects = [ found_object["name"] for found_object in found_objects]
     if len(objects) == 0:
         scene_description += "The scene is empty, there are no blocks or bowls. \n"
@@ -829,7 +832,7 @@ def build_scene_description():
             bowl_map[i] += 1
         else:
             bowl_map[i] = 1
-    for key, value in block_map.items():
+    for key, value in bowl_map.items():
         plural = ""
         if value > 1:
             plural = "s"
@@ -864,13 +867,5 @@ def getAllObjectLocation(*args):
             cps = [Location(x=cp[0], y=cp[1]) for cp in cps]
             all_items += cps
     return all_items
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
     

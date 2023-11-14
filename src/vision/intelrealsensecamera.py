@@ -63,7 +63,7 @@ def build_pipeline():
     
     return pipeline
     
-def get_camera_image(pipeline):
+def get_camera_image():
     # Configure depth and color streams
     frames = pipeline.wait_for_frames()
     depth_frame = frames.get_depth_frame()
@@ -92,21 +92,21 @@ def get_camera_image(pipeline):
     
     
 
-try:
-    while True:
+# try:
+#     while True:
 
-        color_image, depth_colormap = get_camera_image(pipeline)
-        images = np.hstack((color_image, depth_colormap))
+#         color_image, depth_colormap = get_camera_image(pipeline)
+#         images = np.hstack((color_image, depth_colormap))
 
-        # Show images
-        cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
-        cv2.imshow('RealSense', images)
-        cv2.waitKey(1)
+#         # Show images
+#         cv2.namedWindow('RealSense', cv2.WINDOW_AUTOSIZE)
+#         cv2.imshow('RealSense', images)
+#         cv2.waitKey(1)
 
-finally:
+# finally:
 
-    # Stop streaming
-    pipeline.stop()
+#     # Stop streaming
+#     pipeline.stop()
 
 
 
