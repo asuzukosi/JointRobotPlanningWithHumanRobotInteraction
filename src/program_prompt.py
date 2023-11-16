@@ -52,4 +52,5 @@ PickAndPlace(loc1, loc2)
 
 </END EXAMPLES>
 You must execute all the instruction which come in this format with code based on the examples provided.
+If you make a mistake do not respond with plain text, only provide responses with the APIs provided. NO ENGLISH, JUST APIs.
 """

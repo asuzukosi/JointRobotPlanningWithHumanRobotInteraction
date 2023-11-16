@@ -12,7 +12,7 @@ openai.api_base = NAGA_AI_BASE
 openai.api_key = NAGA_AI_KEY
 
 # import vision tools and prompt
-# from vision_funcs import build_scene_description, Location
+from vision_funcs import build_scene_description, Location, getAllObjectLocation, getObjectLocation, get_camera_image
 from program_prompt import SYSTEM_PROMPT
 
 # configure the robot IP address
@@ -48,7 +48,7 @@ def closeRobotConnection(robot: pyniryo.NiryoRobot):
     print("Robot connection closed successfully")
     
 
-# Robot: pyniryo.NiryoRobot = connectRobot(ROBOT_IP_ADDRESS)
+Robot: pyniryo.NiryoRobot = connectRobot()
 print("Robot connection complete")
 
 def calculate_robot_y_axis(pixel_x):
@@ -101,98 +101,98 @@ def getRobotPoseFromPixelValues(pixel_x, pixel_y):
         )
 
 
-# def Pick(loc: Location, shift_x=-30, shift_y=20):
-#     if not loc:
-#         return
-#     pose = getRobotPoseFromPixelValues(loc.x+shift_x, loc.y+shift_y)
-#     Robot.pick_from_pose(pose)
+def Pick(loc: Location, shift_x=-30, shift_y=20):
+    if not loc:
+        return
+    pose = getRobotPoseFromPixelValues(loc.x+shift_x, loc.y+shift_y)
+    Robot.pick_from_pose(pose)
     
     
-# def Place(loc:Location, shift_x=-30, shift_y=20):
-#     if not loc:
-#         return
-#     pose = getRobotPoseFromPixelValues(loc.x+shift_x, loc.y+shift_y)
-#     Robot.place_from_pose(pose)
+def Place(loc:Location, shift_x=-30, shift_y=20):
+    if not loc:
+        return
+    pose = getRobotPoseFromPixelValues(loc.x+shift_x, loc.y+shift_y)
+    Robot.place_from_pose(pose)
 
   
-# def PickAndPlace(loc1:Location, loc2:Location):
-#     if not loc1 or not loc2:
-#         print("** One of the item was not found in the location, aborting action **")
-#         return
-#     Pick(loc1)
-#     time.sleep(3)
-#     Place(loc2)
-#     time.sleep(3)
-#     Robot.move_to_home_pose()
-#     time.sleep(3)
+def PickAndPlace(loc1:Location, loc2:Location):
+    if not loc1 or not loc2:
+        print("** One of the item was not found in the location, aborting action **")
+        return
+    Pick(loc1)
+    time.sleep(3)
+    Place(loc2)
+    time.sleep(3)
+    Robot.move_to_home_pose()
+    time.sleep(3)
 
-# def PickAndPlaceAll(locations: List[Location], loc2:Location):
-#     if len(locations) == 0 or not loc2:
-#         print("** One of the item was not found in the location, aborting action **")
-#         return
-#     for location in locations:
-#         Pick(location)
-#         time.sleep(3)
-#         Place(loc2)
-#         time.sleep(3)
-#     Robot.move_to_home_pose()
-#     time.sleep(3)
+def PickAndPlaceAll(locations: List[Location], loc2:Location):
+    if len(locations) == 0 or not loc2:
+        print("** One of the item was not found in the location, aborting action **")
+        return
+    for location in locations:
+        Pick(location)
+        time.sleep(3)
+        Place(loc2)
+        time.sleep(3)
+    Robot.move_to_home_pose()
+    time.sleep(3)
         
     
-# def MoveLeft(loc1:Location, move_value = 0.2):
-#     if not loc1:
-#         print("** Item was not found in the location, aborting action **")
-#         return
-#     Pick(loc1)
-#     time.sleep(3)
-#     loc1.x += move_value
-#     Place(loc1)
-#     time.sleep(3)
-#     Robot.move_to_home_pose()
-#     time.sleep(3)
+def MoveLeft(loc1:Location, move_value = 0.1):
+    if not loc1:
+        print("** Item was not found in the location, aborting action **")
+        return
+    Pick(loc1)
+    time.sleep(3)
+    loc1.x += move_value
+    Place(loc1)
+    time.sleep(3)
+    Robot.move_to_home_pose()
+    time.sleep(3)
 
 
-# def MoveRight(loc1:Location, move_value = 0.2):
-#     if not loc1:
-#         print("** Item was not found in the location, aborting action **")
-#         return
-#     Pick(loc1)
-#     time.sleep(3)
-#     loc1.x -= move_value
-#     Place(loc1)
-#     time.sleep(3)
-#     Robot.move_to_home_pose()
-#     time.sleep(3)
+def MoveRight(loc1:Location, move_value = 0.1):
+    if not loc1:
+        print("** Item was not found in the location, aborting action **")
+        return
+    Pick(loc1)
+    time.sleep(3)
+    loc1.x -= move_value
+    Place(loc1)
+    time.sleep(3)
+    Robot.move_to_home_pose()
+    time.sleep(3)
     
-# def MoveLeftAll(locations:List[Location], move_value=0.2):
-#     if len(locations) == 0:
-#         print("** One of the item was not found in the location, aborting action **")
-#         return
+def MoveLeftAll(locations:List[Location], move_value=0.1):
+    if len(locations) == 0:
+        print("** One of the item was not found in the location, aborting action **")
+        return
 
-#     for location in locations:
-#         Pick(location)
-#         time.sleep(3)
-#         location.x += move_value
-#         Place(location)
-#         time.sleep(3)
+    for location in locations:
+        Pick(location)
+        time.sleep(3)
+        location.x += move_value
+        Place(location)
+        time.sleep(3)
     
-#     Robot.move_to_home_pose()
-#     time.sleep(3)
+    Robot.move_to_home_pose()
+    time.sleep(3)
 
-# def MoveRightAll(locations:List[Location], move_value =20):
-#     if len(locations) == 0:
-#         print("** One of the item was not found in the location, aborting action **")
-#         return
+def MoveRightAll(locations:List[Location], move_value =0.1):
+    if len(locations) == 0:
+        print("** One of the item was not found in the location, aborting action **")
+        return
 
-#     for location in locations:
-#         Pick(location)
-#         time.sleep(3)
-#         location.x -= move_value
-#         Place(location)
-#         time.sleep(3)
+    for location in locations:
+        Pick(location)
+        time.sleep(3)
+        location.x -= move_value
+        Place(location)
+        time.sleep(3)
     
-#     Robot.move_to_home_pose()
-#     time.sleep(3)
+    Robot.move_to_home_pose()
+    time.sleep(3)
     
 
 def prepare_message(command, scene_description=None):
@@ -275,13 +275,13 @@ def performCycle():
         if resp == 'y':
             try:
                 print("** EXECUTING AI GENERATED ROBOT PLAN** \n")
-                # exec(exec_response)
+                exec(exec_response)
                 print("** AI GENERATE ROBOT PLAN EXECUTED SUCCESSFULLY **")
                 return
             except Exception as e:
                 print("** Failed to execute Robot plan with exception: %s" % e)
                 addMessage({"role": "assistant", "content": exec_response })
-                addMessage({"role": "system", "conent": f"you failed to execute the exception {e}"})
+                addMessage({"role": "system", "content": f"you failed to execute the exception {e}"})
         else:
             resp = input("Would you like to provide feedback for the robot? y or n")
             if resp != 'y':
