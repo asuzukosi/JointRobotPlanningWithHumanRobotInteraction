@@ -14,6 +14,11 @@ import tensorflow.compat.v1 as tf
 import time
 from vision.intelrealsensecamera import get_camera_image
 from dataclasses import dataclass
+from transformers import pipeline
+
+checkpoint = "google/owlvit-base-patch32"
+detector = pipeline(model=checkpoint, task="zero-shot-object-detection")
+
 
 
 def load_clip_model(model_name="ViT-B/32"):
@@ -746,27 +751,11 @@ def findObjectInScene(image, target_object=None):
     finds all the instances of the target object in the scene
     """
     category_names = ['blue block',
-                  'red block',
-                  'green block',
-                  'orange block',
-                  'yellow block',
-                  'purple block',
-                  'pink block',
-                  'cyan block',
-                  'brown block',
-                  'gray block',
-
-                  'blue bowl',
-                  'red bowl',
-                  'green bowl',
-                  'orange bowl',
-                  'yellow bowl',
-                  'purple bowl',
-                  'pink bowl',
-                  'cyan bowl',
-                  'brown bowl',
-                  'gray bowl']
-    
+                    'red block',
+                    'green block',
+                    'yellow block',
+                    'black block']
+        
     image_path = "liveimage.jpg"
     try:
         cv2.imwrite(image_path, image)
@@ -848,7 +837,10 @@ class Location:
 
 def getObjectLocation(target_object):
     image, _ = get_camera_image()
-    item = findObjectInScene(image, target_object)
+    if "block" in target_object:
+        item = findObjectInScene(image, target_object)
+    else:
+        item = getBoxLocation(image, target_object)
     if len(item) == 0:
         print(f"**No {target_object} found**")
         return None
@@ -859,7 +851,10 @@ def getAllObjectLocation(*args):
     all_items = []
     image, _ = get_camera_image()
     for arg in args:
-        items = findObjectInScene(image, arg)
+        if "block" in arg:
+            items = findObjectInScene(image, arg)
+        else:
+            items = getBoxLocation(image, arg)
         if len(items) == 0:
             continue
         else:
@@ -868,4 +863,37 @@ def getAllObjectLocation(*args):
             all_items += cps
     return all_items
 
+
+def processPrediction(predictions):
+    new_predictions = []
+    for prediction in predictions:
+        new_prediction = {
+            "name": prediction["label"],
+            "score": prediction["score"],
+            "bbox": np.array([np.float64(prediction["box"]["xmin"]),
+                              np.float64(prediction["box"]["ymin"]),
+                              abs(prediction["box"]["xmax"] - prediction["box"]["xmin"]), 
+                              abs(prediction["box"]["ymax"] - prediction["box"]["ymin"])]),
+            "center_point": calculate_center_point(np.float64(prediction["box"]["xmin"]),np.float64(prediction["box"]["ymin"]),
+                                                    abs(prediction["box"]["xmax"] - prediction["box"]["xmin"]), 
+                                                    abs(prediction["box"]["ymax"] - prediction["box"]["ymin"]))
+        }
+        new_predictions.append(new_prediction)
+        
+    return new_predictions
+
+def getBoxLocation(image, target):
+    image_path = "liveimage.jpg"
+    try:
+        cv2.imwrite(image_path, image)
+    except Exception as e:
+        return f"Failed to save image to {image_path} with exception {e}"
+    image = Image.open(image_path)
     
+    predictions = detector(
+                            image,
+                            candidate_labels=[target]
+                        )
+    
+    predictions = processPrediction(predictions)
+    return predictions
