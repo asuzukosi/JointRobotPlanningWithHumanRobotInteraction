@@ -2,7 +2,7 @@ from llama_cpp import Llama
 MODEL_PATH = "codellama-7b-instruct.Q2_K.gguf"
 
 def load_llm():
-    llm = Llama(model_path=MODEL_PATH, n_ctx=1024)
+    llm = Llama(model_path=MODEL_PATH, n_ctx=4096)
     return llm
 
 def llm_response(prompt):

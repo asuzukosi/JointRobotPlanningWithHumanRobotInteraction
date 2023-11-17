@@ -5,7 +5,7 @@ import time
 from typing import List
 
 # configure openai key and informaation
-NAGA_AI_BASE = "https://api.naga.ac/v1"
+NAGA_AI_BASE =  "https://api.naga.ac/v1"
 NAGA_AI_KEY = "VN7eDdNzbkQkrmEmIr1Gj1Kci3Ed_g6a_atrW14jq6c"
 
 openai.api_base = NAGA_AI_BASE
@@ -191,8 +191,21 @@ def MoveRightAll(locations:List[Location], move_value =0.1):
         Place(location)
         time.sleep(3)
     
-    Robot.move_to_home_pose()
-    time.sleep(3)
+#     Robot.move_to_home_pose()
+#     time.sleep(3)
+
+from llama_cpp import Llama
+MODEL_PATH = "codellama-7b-instruct.Q2_K.gguf"
+
+def load_llm():
+    llm = Llama(model_path=MODEL_PATH, n_ctx=2048)
+    return llm
+
+def llm_response(prompt):
+    llm = load_llm()
+    llm_pipeline = llm(prompt, max_tokens=1000, temperature=0)
+    text_from_choices = llm_pipeline['choices'][0]['text']
+    return text_from_choices
     
 
 def prepare_message(command, scene_description=None):
@@ -255,9 +268,8 @@ def generate_response():
     )
     result = response["choices"][0]["message"]["content"]
     return result
-
-
-def performCycle():
+    
+while True:
     command = input("Enter robot command: ")
     print(f"You have enterd the instructurion '{command}'")
     # build scene description with the vision model

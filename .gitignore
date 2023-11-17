@@ -13,3 +13,4 @@ robotiq_2f_85*
 image_path_v2
 /__pycache__/
 __pycache__/
+codellama-7b-instruct.Q2_K.gguf
