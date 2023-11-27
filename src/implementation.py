@@ -51,67 +51,74 @@ def closeRobotConnection(robot: pyniryo.NiryoRobot):
 # Robot: pyniryo.NiryoRobot = connectRobot(ROBOT_IP_ADDRESS)
 print("Robot connection complete")
 
-def calculate_robot_y_axis(pixel_x):
-    # Calculate the y axis for the robot arm mmovement given the
-    # pixel x axis
+def calculate_robot_x_axis(pixel_y, pixel_y_base=50, 
+                           robot_x_base=0.1413):
+    """
+    This will take the y axis of the pixel image and calculate the robot x axis
+    The pixel y base is the base / minimum value which the robot can reach this should be set at the beginning of the experiment
+    THe robot x base is robot x pose value for the provided pixel base
+    """
+    CONVERSTION_VALUE = 0.0009135
+    # check if pixel value is within range
+    if (pixel_y < pixel_y_base or pixel_y > 315):
+        raise Exception("Pixel Y is out of robot range")
+    # get difference from base
+    difference = abs(pixel_y - pixel_y_base)
     
+    # multiply difference by conversion factor
+    robot_axis_difference = difference * CONVERSTION_VALUE
+    
+    # add robot axis difference to robot axis base
+    robot_x_axis = robot_x_base + robot_axis_difference
+    return robot_x_axis
+
+def calculate_robot_y_axis(pixel_x, 
+                           pixel_x_base=110, 
+                           robot_y_base=-0.2440):
+    """
+    This will take the x axis of the pixel image and calculate the robot y axis
+    The pixel x base is the base / minimum value which the robot can reach this should be set at the beginning of the experiment
+    THe robot y base is robot x pose value for the provided pixel base
+    """
+    
+    CONVERSTION_VALUE = 0.001006968
     # check if pixel is within the desired range
-    if (pixel_x < 0 or pixel_x > 640):
+    if (pixel_x < 110 or pixel_x > 640):
         raise Exception("Pixel X is out of robot range")
     
     # calculate difference from base
-    PIXEL_BASE = 0
-    pixel_differnce = abs(pixel_x - PIXEL_BASE)
+    pixel_difference = abs(pixel_x - pixel_x_base)
     
     # multiply difference by conversion factor
-    robot_axis_difference = pixel_differnce * 0.00093578
+    robot_axis_difference = pixel_difference * CONVERSTION_VALUE
     
     # add robot axis difference to robot base
-    ROBOT_AXIS_BASE = 0.2858
-    robot_y_axis = ROBOT_AXIS_BASE - robot_axis_difference
+    robot_y_axis = robot_y_base + robot_axis_difference
     return robot_y_axis
-
-
-def calculate_robot_x_axis(pixel_y):
-    # Calculates the x axis for the robots movement given the pixel y axis
-    
-    # check if pixel value is within range
-    if (pixel_y < 215 or pixel_y > 415):
-        raise Exception("Pixel Y is out of robot range")
-    # get difference from base
-    PIXEL_BASE = 415
-    difference = abs(PIXEL_BASE - pixel_y)
-    
-    # multiply difference by conversion factor
-    robot_axis_difference = difference * 0.00093578
-    
-    # add robot axis difference to robot axis base
-    ROBOT_AXIS_BASE = 0.1495
-    robot_x_axis = ROBOT_AXIS_BASE + robot_axis_difference
-    return robot_x_axis
     
 
-def getRobotPoseFromPixelValues(pixel_x, pixel_y):
+def getRobotPoseFromPixelValues(pixel_x, pixel_y, action="pick"):
     y = calculate_robot_y_axis(pixel_x)
     x = calculate_robot_x_axis(pixel_y)
+    z = 0.063 if action == "pick" else 0.055
     
     return pyniryo.PoseObject(
-        x=x, y=y, z=0.065,
+        x=x, y=y, z=z,
         roll=-0.1, pitch=1.57, yaw=0.0,
         )
 
 
-def Pick(loc: Location, shift_x=-30, shift_y=20):
+def Pick(loc: Location, shift_x=0, shift_y=0):
     if not loc:
         return
-    pose = getRobotPoseFromPixelValues(loc.x+shift_x, loc.y+shift_y)
+    pose = getRobotPoseFromPixelValues(loc.x+shift_x, loc.y+shift_y, "pick")
     Robot.pick_from_pose(pose)
     
     
-def Place(loc:Location, shift_x=-30, shift_y=20):
+def Place(loc:Location, shift_x=0, shift_y=0):
     if not loc:
         return
-    pose = getRobotPoseFromPixelValues(loc.x+shift_x, loc.y+shift_y)
+    pose = getRobotPoseFromPixelValues(loc.x+shift_x, loc.y+shift_y, "place")
     Robot.place_from_pose(pose)
 
   
