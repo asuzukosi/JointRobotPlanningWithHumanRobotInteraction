@@ -3,6 +3,7 @@ import openai
 import pyniryo
 import time
 from typing import List
+from vision_funcs import Location
 
 # configure openai key and informaation
 NAGA_AI_BASE = "https://api.naga.ac/v1"
@@ -269,7 +270,7 @@ def performCycle():
     print(f"You have enterd the instructurion '{command}'")
     # build scene description with the vision model
     # scene_description = build_scene_description()
-    scene_description = "There are 4 blocks in the scene \n 2 red blocks \n 2 green blocks, there is 1 bowl in the scene \n 1 blue bowl"
+    scene_description = "There are 4 blocks in the scene \n 1 red block \n 1 green block, \n 1 blue block \n 1 black block \n there are 2 bowls in the scene \n 1 blue bowl \n 1 green bowl"
     print(scene_description)
     scene_description = scene_description if shouldAddSceneDescription() else None
     message = prepare_message(command, scene_description)
