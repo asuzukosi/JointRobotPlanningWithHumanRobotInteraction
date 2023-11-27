@@ -653,7 +653,10 @@ def vild(image_path, category_name_string, params, plot_on=True, prompt_swaps=[]
     image_scale = np.tile(image_info[2:3, :], (1, 2))
     image_height = int(image_info[0, 0])
     image_width = int(image_info[0, 1])
-    
+
+    print("x axis: ", image_width, " y axis : ", image_height)
+
+
     rescaled_detection_boxes = detection_boxes / image_scale # rescale
 
     # Read image
@@ -883,17 +886,19 @@ def processPrediction(predictions):
     return new_predictions
 
 def getBoxLocation(image, target):
+    print("Using other function")
     image_path = "liveimage.jpg"
     try:
         cv2.imwrite(image_path, image)
     except Exception as e:
         return f"Failed to save image to {image_path} with exception {e}"
     image = Image.open(image_path)
-    
+    print("x axis: ", image.size[0], " y axis : ", image.size[1])
+    print(target)
     predictions = detector(
                             image,
                             candidate_labels=[target]
                         )
-    
+    print(predictions)
     predictions = processPrediction(predictions)
     return predictions

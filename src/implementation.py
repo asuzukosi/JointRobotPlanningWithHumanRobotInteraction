@@ -5,14 +5,14 @@ import time
 from typing import List
 
 # configure openai key and informaation
-NAGA_AI_BASE =  "https://api.naga.ac/v1"
+NAGA_AI_BASE = "https://api.naga.ac/v1"
 NAGA_AI_KEY = "VN7eDdNzbkQkrmEmIr1Gj1Kci3Ed_g6a_atrW14jq6c"
 
 openai.api_base = NAGA_AI_BASE
 openai.api_key = NAGA_AI_KEY
 
 # import vision tools and prompt
-from vision_funcs import build_scene_description, Location, getAllObjectLocation, getObjectLocation, get_camera_image
+# from vision_funcs import build_scene_description, Location
 from program_prompt import SYSTEM_PROMPT
 
 # configure the robot IP address
@@ -48,7 +48,7 @@ def closeRobotConnection(robot: pyniryo.NiryoRobot):
     print("Robot connection closed successfully")
     
 
-Robot: pyniryo.NiryoRobot = connectRobot()
+# Robot: pyniryo.NiryoRobot = connectRobot(ROBOT_IP_ADDRESS)
 print("Robot connection complete")
 
 def calculate_robot_y_axis(pixel_x):
@@ -139,7 +139,7 @@ def PickAndPlaceAll(locations: List[Location], loc2:Location):
     time.sleep(3)
         
     
-def MoveLeft(loc1:Location, move_value = 0.1):
+def MoveLeft(loc1:Location, move_value = 0.2):
     if not loc1:
         print("** Item was not found in the location, aborting action **")
         return
@@ -152,7 +152,7 @@ def MoveLeft(loc1:Location, move_value = 0.1):
     time.sleep(3)
 
 
-def MoveRight(loc1:Location, move_value = 0.1):
+def MoveRight(loc1:Location, move_value = 0.2):
     if not loc1:
         print("** Item was not found in the location, aborting action **")
         return
@@ -164,7 +164,7 @@ def MoveRight(loc1:Location, move_value = 0.1):
     Robot.move_to_home_pose()
     time.sleep(3)
     
-def MoveLeftAll(locations:List[Location], move_value=0.1):
+def MoveLeftAll(locations:List[Location], move_value=0.2):
     if len(locations) == 0:
         print("** One of the item was not found in the location, aborting action **")
         return
@@ -179,7 +179,7 @@ def MoveLeftAll(locations:List[Location], move_value=0.1):
     Robot.move_to_home_pose()
     time.sleep(3)
 
-def MoveRightAll(locations:List[Location], move_value =0.1):
+def MoveRightAll(locations:List[Location], move_value =20):
     if len(locations) == 0:
         print("** One of the item was not found in the location, aborting action **")
         return
@@ -191,21 +191,8 @@ def MoveRightAll(locations:List[Location], move_value =0.1):
         Place(location)
         time.sleep(3)
     
-#     Robot.move_to_home_pose()
-#     time.sleep(3)
-
-from llama_cpp import Llama
-MODEL_PATH = "codellama-7b-instruct.Q2_K.gguf"
-
-def load_llm():
-    llm = Llama(model_path=MODEL_PATH, n_ctx=2048)
-    return llm
-
-def llm_response(prompt):
-    llm = load_llm()
-    llm_pipeline = llm(prompt, max_tokens=1000, temperature=0)
-    text_from_choices = llm_pipeline['choices'][0]['text']
-    return text_from_choices
+    Robot.move_to_home_pose()
+    time.sleep(3)
     
 
 def prepare_message(command, scene_description=None):
@@ -268,8 +255,9 @@ def generate_response():
     )
     result = response["choices"][0]["message"]["content"]
     return result
-    
-while True:
+
+
+def performCycle():
     command = input("Enter robot command: ")
     print(f"You have enterd the instructurion '{command}'")
     # build scene description with the vision model
@@ -287,13 +275,13 @@ while True:
         if resp == 'y':
             try:
                 print("** EXECUTING AI GENERATED ROBOT PLAN** \n")
-                exec(exec_response)
+                # exec(exec_response)
                 print("** AI GENERATE ROBOT PLAN EXECUTED SUCCESSFULLY **")
                 return
             except Exception as e:
                 print("** Failed to execute Robot plan with exception: %s" % e)
                 addMessage({"role": "assistant", "content": exec_response })
-                addMessage({"role": "system", "content": f"you failed to execute the exception {e}"})
+                addMessage({"role": "system", "conent": f"you failed to execute the exception {e}"})
         else:
             resp = input("Would you like to provide feedback for the robot? y or n")
             if resp != 'y':
