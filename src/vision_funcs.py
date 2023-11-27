@@ -753,7 +753,9 @@ def findObjectInScene(image, target_object=None):
     Given an image and a target object it 
     finds all the instances of the target object in the scene
     """
-    category_names = ['blue block',
+    category_names = [
+                    'block'
+                    'blue block',
                     'red block',
                     'green block',
                     'yellow block',
@@ -845,7 +847,8 @@ def getObjectLocation(target_object):
     if target_object == "blue bowl" or target_object == "green box":
         return Location(430, 191)
     else:
-        item = getBoxLocation(image, target_object)
+
+        item = findObjectInScene(image, target_object)
     if len(item) == 0:
         print(f"**No {target_object} found**")
         return None

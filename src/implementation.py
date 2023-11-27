@@ -3,7 +3,7 @@ import openai
 import pyniryo
 import time
 from typing import List
-from vision_funcs import Location
+from vision_funcs import Location, getAllObjectLocation, getObjectLocation, get_camera_image
 
 # configure openai key and informaation
 NAGA_AI_BASE = "https://api.naga.ac/v1"
@@ -49,7 +49,7 @@ def closeRobotConnection(robot: pyniryo.NiryoRobot):
     print("Robot connection closed successfully")
     
 
-# Robot: pyniryo.NiryoRobot = connectRobot(ROBOT_IP_ADDRESS)
+Robot: pyniryo.NiryoRobot = connectRobot()
 print("Robot connection complete")
 
 def calculate_robot_x_axis(pixel_y, pixel_y_base=50, 
@@ -283,13 +283,13 @@ def performCycle():
         if resp == 'y':
             try:
                 print("** EXECUTING AI GENERATED ROBOT PLAN** \n")
-                # exec(exec_response)
+                exec(exec_response)
                 print("** AI GENERATE ROBOT PLAN EXECUTED SUCCESSFULLY **")
                 return
             except Exception as e:
                 print("** Failed to execute Robot plan with exception: %s" % e)
                 addMessage({"role": "assistant", "content": exec_response })
-                addMessage({"role": "system", "conent": f"you failed to execute the exception {e}"})
+                addMessage({"role": "system", "content": f"you failed to execute the exception {e}"})
         else:
             resp = input("Would you like to provide feedback for the robot? y or n")
             if resp != 'y':
@@ -309,5 +309,6 @@ def startInteraction():
 
 
 
-startInteraction()
-closeRobotConnection()
+# startInteraction()
+# closeRobotConnection()
+Robot.set_learning_mode(True)
