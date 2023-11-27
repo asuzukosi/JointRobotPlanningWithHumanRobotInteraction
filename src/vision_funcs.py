@@ -14,6 +14,11 @@ import tensorflow.compat.v1 as tf
 import time
 from vision.intelrealsensecamera import get_camera_image
 from dataclasses import dataclass
+from transformers import pipeline
+
+checkpoint = "google/owlvit-base-patch32"
+detector = pipeline(model=checkpoint, task="zero-shot-object-detection")
+
 
 
 def load_clip_model(model_name="ViT-B/32"):
@@ -600,7 +605,7 @@ gpu_options
 
 
 session = tf.Session(graph=tf.Graph(), config=tf.ConfigProto(gpu_options=gpu_options))
-saved_model_dir = "/Users/kosisochukwuasuzu/Developer/machine_learning/llm-robotics/src/image_path_v2"
+saved_model_dir = "/home/robotics/PythonProject/ned_lang/src/image_path_v2"
 _ = tf.saved_model.loader.load(session, ["serve"], saved_model_dir)
 
 def display_image(path_or_array, size=(10, 10)):
@@ -648,7 +653,10 @@ def vild(image_path, category_name_string, params, plot_on=True, prompt_swaps=[]
     image_scale = np.tile(image_info[2:3, :], (1, 2))
     image_height = int(image_info[0, 0])
     image_width = int(image_info[0, 1])
-    
+
+    print("x axis: ", image_width, " y axis : ", image_height)
+
+
     rescaled_detection_boxes = detection_boxes / image_scale # rescale
 
     # Read image
@@ -731,6 +739,7 @@ def vild(image_path, category_name_string, params, plot_on=True, prompt_swaps=[]
                                                                                                                                             proccessed_box[3])})
     if not plot_on:
         return found_objects
+    return found_objects
 
 def calculate_center_point(x, y, w, h):
     # Calculate the center point given teh bounding box values
@@ -745,32 +754,17 @@ def findObjectInScene(image, target_object=None):
     finds all the instances of the target object in the scene
     """
     category_names = ['blue block',
-                  'red block',
-                  'green block',
-                  'orange block',
-                  'yellow block',
-                  'purple block',
-                  'pink block',
-                  'cyan block',
-                  'brown block',
-                  'gray block',
-
-                  'blue bowl',
-                  'red bowl',
-                  'green bowl',
-                  'orange bowl',
-                  'yellow bowl',
-                  'purple bowl',
-                  'pink bowl',
-                  'cyan bowl',
-                  'brown bowl',
-                  'gray bowl']
-    
+                    'red block',
+                    'green block',
+                    'yellow block',
+                    'black block']
+        
     image_path = "liveimage.jpg"
     try:
         cv2.imwrite(image_path, image)
     except Exception as e:
         return f"Failed to save image to {image_path} with exception {e}"
+
     
     category_name_string = ";".join(category_names)
     max_boxes_to_draw = 8 #@param {type:"integer"}
@@ -802,6 +796,7 @@ def build_scene_description():
     image, _ = get_camera_image()
     scene_description = ""
     found_objects = findObjectInScene(image)
+    print(found_objects)
     objects = [ found_object["name"] for found_object in found_objects]
     if len(objects) == 0:
         scene_description += "The scene is empty, there are no blocks or bowls. \n"
@@ -829,7 +824,7 @@ def build_scene_description():
             bowl_map[i] += 1
         else:
             bowl_map[i] = 1
-    for key, value in block_map.items():
+    for key, value in bowl_map.items():
         plural = ""
         if value > 1:
             plural = "s"
@@ -845,7 +840,12 @@ class Location:
 
 def getObjectLocation(target_object):
     image, _ = get_camera_image()
-    item = findObjectInScene(image, target_object)
+    if target_object == "green bowl" or target_object == "green box":
+        return Location(182, 209)
+    if target_object == "blue bowl" or target_object == "green box":
+        return Location(430, 191)
+    else:
+        item = getBoxLocation(image, target_object)
     if len(item) == 0:
         print(f"**No {target_object} found**")
         return None
@@ -856,7 +856,10 @@ def getAllObjectLocation(*args):
     all_items = []
     image, _ = get_camera_image()
     for arg in args:
-        items = findObjectInScene(image, arg)
+        if "block" in arg:
+            items = findObjectInScene(image, arg)
+        else:
+            items = getBoxLocation(image, arg)
         if len(items) == 0:
             continue
         else:
@@ -864,13 +867,41 @@ def getAllObjectLocation(*args):
             cps = [Location(x=cp[0], y=cp[1]) for cp in cps]
             all_items += cps
     return all_items
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+def processPrediction(predictions):
+    new_predictions = []
+    for prediction in predictions:
+        new_prediction = {
+            "name": prediction["label"],
+            "score": prediction["score"],
+            "bbox": np.array([np.float64(prediction["box"]["xmin"]),
+                              np.float64(prediction["box"]["ymin"]),
+                              abs(prediction["box"]["xmax"] - prediction["box"]["xmin"]), 
+                              abs(prediction["box"]["ymax"] - prediction["box"]["ymin"])]),
+            "center_point": calculate_center_point(np.float64(prediction["box"]["xmin"]),np.float64(prediction["box"]["ymin"]),
+                                                    abs(prediction["box"]["xmax"] - prediction["box"]["xmin"]), 
+                                                    abs(prediction["box"]["ymax"] - prediction["box"]["ymin"]))
+        }
+        new_predictions.append(new_prediction)
+        
+    return new_predictions
+
+def getBoxLocation(image, target):
+
+    print("Using other function")
+    image_path = "liveimage.jpg"
+    try:
+        cv2.imwrite(image_path, image)
+    except Exception as e:
+        return f"Failed to save image to {image_path} with exception {e}"
+    image = Image.open(image_path)
+    print("x axis: ", image.size[0], " y axis : ", image.size[1])
+    print(target)
+    predictions = detector(
+                            image,
+                            candidate_labels=[target]
+                        )
+    print(predictions)
+    predictions = processPrediction(predictions)
+    return predictions
