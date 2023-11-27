@@ -840,8 +840,10 @@ class Location:
 
 def getObjectLocation(target_object):
     image, _ = get_camera_image()
-    if "block" in target_object:
-        item = findObjectInScene(image, target_object)
+    if target_object == "green bowl" or target_object == "green box":
+        return Location(182, 209)
+    if target_object == "blue bowl" or target_object == "green box":
+        return Location(430, 191)
     else:
         item = getBoxLocation(image, target_object)
     if len(item) == 0:
@@ -886,6 +888,7 @@ def processPrediction(predictions):
     return new_predictions
 
 def getBoxLocation(image, target):
+
     print("Using other function")
     image_path = "liveimage.jpg"
     try:
