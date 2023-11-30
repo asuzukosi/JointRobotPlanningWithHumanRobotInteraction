@@ -49,7 +49,7 @@ def closeRobotConnection(robot: pyniryo.NiryoRobot):
     print("Robot connection closed successfully")
     
 
-# Robot: pyniryo.NiryoRobot = connectRobot(ROBOT_IP_ADDRESS)
+Robot: pyniryo.NiryoRobot = connectRobot(ROBOT_IP_ADDRESS)
 print("Robot connection complete")
 
 def calculate_robot_x_axis(pixel_y, pixel_y_base=50, 

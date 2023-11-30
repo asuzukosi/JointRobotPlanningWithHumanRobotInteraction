@@ -1,0 +1,1 @@
+print("MASKS=SAM(image=IMAGE)\nOBJS, MASKS=ImageCrop(image=IMAGE, masks=MASKS)\nOBJ0=CLIPRetrieval(objs=OBJS, query='the green and purple polka dot block')\nLOC0=Pixel2Loc(obj=OBJ0, masks=MASKS)\nOBJ1=CLIPRetrieval(objs=OBJS, query='the green container', obj0=OBJ0)\nLOC1=Pixel2Loc(obj=OBJ1, masks=MASKS)\nPickPlace(pick=LOC0, place=LOC1, bounds=BOUNDS)")
