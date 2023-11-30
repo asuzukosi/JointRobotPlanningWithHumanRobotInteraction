@@ -5,7 +5,6 @@ detr-resnet-50_finetuned_cppe5
 cppe5
 llama.cpp/
 *.bin
-*.jpg
 .vscode
 robotiq*
 /robotiq_2f_85/
