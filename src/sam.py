@@ -73,14 +73,6 @@ if engine == "openclip":
         "ViT-H-14": "open_clip_pytorch_model.bin",
     }
     models = list(model_cards.keys())
-    # add offline model for OpenCLIP
-    # model, _, preprocess = open_clip.create_model_and_transforms(
-    #     "ViT-H-14", device=device, pretrained="laion2b_s32b_b79k"
-    # )
-    # model, _, preprocess = open_clip.create_model_and_transforms(
-    #     "ViT-H-14", device=device, pretrained="/data/open_clip/open_clip_pytorch_model.bin"
-    # )
-    # tokenizer = open_clip.get_tokenizer("ViT-H-14")
     clip_index = 3  # default to use the VIT-H-14
     model, _, preprocess = open_clip.create_model_and_transforms(
         models[clip_index],
