@@ -16,8 +16,6 @@ from vision.intelrealsensecamera import get_camera_image
 from dataclasses import dataclass
 from transformers import pipeline
 
-checkpoint = "google/owlvit-base-patch32"
-detector = pipeline(model=checkpoint, task="zero-shot-object-detection")
 
 
 
@@ -843,9 +841,9 @@ class Location:
 def getObjectLocation(target_object):
     image, _ = get_camera_image()
     if target_object == "green bowl" or target_object == "green box":
-        return Location(182, 209)
+        return Location(182, 225)
     if target_object == "blue bowl" or target_object == "green box":
-        return Location(430, 191)
+        return Location(434, 225)
     else:
 
         item = findObjectInScene(image, target_object)
@@ -859,10 +857,12 @@ def getAllObjectLocation(*args):
     all_items = []
     image, _ = get_camera_image()
     for arg in args:
-        if "block" in arg:
-            items = findObjectInScene(image, arg)
+        if target_object == "green bowl" or target_object == "green box":
+            return [Location(182, 225)]
+        if target_object == "blue bowl" or target_object == "green box":
+            return [Location(434, 225)]
         else:
-            items = getBoxLocation(image, arg)
+            items = findObjectInScene(image, arg)
         if len(items) == 0:
             continue
         else:
@@ -890,21 +890,4 @@ def processPrediction(predictions):
         
     return new_predictions
 
-def getBoxLocation(image, target):
 
-    print("Using other function")
-    image_path = "liveimage.jpg"
-    try:
-        cv2.imwrite(image_path, image)
-    except Exception as e:
-        return f"Failed to save image to {image_path} with exception {e}"
-    image = Image.open(image_path)
-    print("x axis: ", image.size[0], " y axis : ", image.size[1])
-    print(target)
-    predictions = detector(
-                            image,
-                            candidate_labels=[target]
-                        )
-    print(predictions)
-    predictions = processPrediction(predictions)
-    return predictions

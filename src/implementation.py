@@ -101,7 +101,7 @@ def calculate_robot_y_axis(pixel_x,
 def getRobotPoseFromPixelValues(pixel_x, pixel_y, action="pick"):
     y = calculate_robot_y_axis(pixel_x)
     x = calculate_robot_x_axis(pixel_y)
-    z = 0.063 if action == "pick" else 0.055
+    z = 0.063 if action == "pick" else 0.1
     
     return pyniryo.PoseObject(
         x=x, y=y, z=z,
@@ -109,14 +109,14 @@ def getRobotPoseFromPixelValues(pixel_x, pixel_y, action="pick"):
         )
 
 
-def Pick(loc: Location, shift_x=0, shift_y=0):
+def Pick(loc: Location, shift_x=0, shift_y=33):
     if not loc:
         return
     pose = getRobotPoseFromPixelValues(loc.x+shift_x, loc.y+shift_y, "pick")
     Robot.pick_from_pose(pose)
     
     
-def Place(loc:Location, shift_x=0, shift_y=0):
+def Place(loc:Location, shift_x=0, shift_y=33):
     if not loc:
         return
     pose = getRobotPoseFromPixelValues(loc.x+shift_x, loc.y+shift_y, "place")
@@ -128,11 +128,13 @@ def PickAndPlace(loc1:Location, loc2:Location):
         print("** One of the item was not found in the location, aborting action **")
         return
     Pick(loc1)
-    time.sleep(3)
-    Place(loc2)
-    time.sleep(3)
+    time.sleep(1)
     Robot.move_to_home_pose()
-    time.sleep(3)
+    time.sleep(1)
+    Place(loc2)
+    time.sleep(1)
+    Robot.move_to_home_pose()
+    time.sleep(1)
 
 def PickAndPlaceAll(locations: List[Location], loc2:Location):
     if len(locations) == 0 or not loc2:
@@ -140,11 +142,13 @@ def PickAndPlaceAll(locations: List[Location], loc2:Location):
         return
     for location in locations:
         Pick(location)
-        time.sleep(3)
+        time.sleep(1)
+        Robot.move_to_home_pose()
+        time.sleep(1)
         Place(loc2)
-        time.sleep(3)
+        time.sleep(1)
     Robot.move_to_home_pose()
-    time.sleep(3)
+    time.sleep(1)
         
     
 def MoveLeft(loc1:Location, move_value = 0.2):
@@ -152,12 +156,12 @@ def MoveLeft(loc1:Location, move_value = 0.2):
         print("** Item was not found in the location, aborting action **")
         return
     Pick(loc1)
-    time.sleep(3)
+    time.sleep(1)
     loc1.x += move_value
     Place(loc1)
-    time.sleep(3)
+    time.sleep(1)
     Robot.move_to_home_pose()
-    time.sleep(3)
+    time.sleep(1)
 
 
 def MoveRight(loc1:Location, move_value = 0.2):
@@ -165,12 +169,12 @@ def MoveRight(loc1:Location, move_value = 0.2):
         print("** Item was not found in the location, aborting action **")
         return
     Pick(loc1)
-    time.sleep(3)
+    time.sleep(1)
     loc1.x -= move_value
     Place(loc1)
-    time.sleep(3)
+    time.sleep(1)
     Robot.move_to_home_pose()
-    time.sleep(3)
+    time.sleep(1)
     
 def MoveLeftAll(locations:List[Location], move_value=0.2):
     if len(locations) == 0:
@@ -179,13 +183,13 @@ def MoveLeftAll(locations:List[Location], move_value=0.2):
 
     for location in locations:
         Pick(location)
-        time.sleep(3)
+        time.sleep(1)
         location.x += move_value
         Place(location)
-        time.sleep(3)
+        time.sleep(1)
     
     Robot.move_to_home_pose()
-    time.sleep(3)
+    time.sleep(1)
 
 def MoveRightAll(locations:List[Location], move_value =20):
     if len(locations) == 0:
@@ -194,13 +198,13 @@ def MoveRightAll(locations:List[Location], move_value =20):
 
     for location in locations:
         Pick(location)
-        time.sleep(3)
+        time.sleep(1)
         location.x -= move_value
         Place(location)
-        time.sleep(3)
+        time.sleep(1)
     
     Robot.move_to_home_pose()
-    time.sleep(3)
+    time.sleep(1)
     
 
 def prepare_message(command, scene_description=None):
@@ -308,7 +312,6 @@ def startInteraction():
         performCycle()
 
 
+startInteraction()
+closeRobotConnection()
 
-# startInteraction()
-# closeRobotConnection()
-Robot.set_learning_mode(True)
