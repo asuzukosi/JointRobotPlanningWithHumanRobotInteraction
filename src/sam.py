@@ -378,13 +378,17 @@ def Pixel2Loc(obj, masks):
 
 ###### -------------------------- MAIN FUNCTIONS TO BE IMPLEMENTED ARE (getObjectLocation, getAllObjectLocation) ----------------- ######
 
-def getObjectLocation(target_object):
-    image, _ = get_camera_image()
-    image_path = "liveimage.jpg"
-    try:
-        cv2.imwrite(image_path, image)
-    except Exception as e:
-        return f"Failed to save image to {image_path} with exception {e}"
+def getObjectLocation(target_object, image_path=None):
+    if not image_path:
+        raise Exception("Dont use this path, it is dark path")
+        image, _ = get_camera_image()
+        image_path = "liveimage.jpg"
+    # else:
+    #     image = Image.open(image_path)
+    # try:
+    #     cv2.imwrite(image_path, image)
+    # except Exception as e:
+    #     return f"Failed to save image to {image_path} with exception {e}"
     image = Image.open(image_path).convert("RGB")
     # read image into numpy array
     IMAGE = np.array(image)

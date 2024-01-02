@@ -43,7 +43,7 @@ def closeRobotConnection(robot: pyniryo.NiryoRobot):
 Robot: pyniryo.NiryoRobot = connectRobot()
 print("Robot connection complete")
 
-def calculate_robot_x_axis(pixel_y, pixel_y_base=50, 
+def calculate_robot_x_axis(pixel_y, pixel_y_base=0, 
                            robot_x_base=0.1413):
     """
     This will take the y axis of the pixel image and calculate the robot x axis
@@ -52,8 +52,8 @@ def calculate_robot_x_axis(pixel_y, pixel_y_base=50,
     """
     CONVERSTION_VALUE = 0.0009135
     # check if pixel value is within range
-    if (pixel_y < pixel_y_base or pixel_y > 315):
-        raise Exception("Pixel Y is out of robot range")
+    # if (pixel_y < pixel_y_base or pixel_y > 315):
+    #     raise Exception("Pixel Y is out of robot range")
     # get difference from base
     difference = abs(pixel_y - pixel_y_base)
     
@@ -75,8 +75,8 @@ def calculate_robot_y_axis(pixel_x,
     
     CONVERSTION_VALUE = 0.001006968
     # check if pixel is within the desired range
-    if (pixel_x < 110 or pixel_x > 640):
-        raise Exception("Pixel X is out of robot range")
+    # if (pixel_x < 110 or pixel_x > 640):
+    #     raise Exception("Pixel X is out of robot range")
     
     # calculate difference from base
     pixel_difference = abs(pixel_x - pixel_x_base)
@@ -92,7 +92,7 @@ def calculate_robot_y_axis(pixel_x,
 def getRobotPoseFromPixelValues(pixel_x, pixel_y, action="pick"):
     y = calculate_robot_y_axis(pixel_x)
     x = calculate_robot_x_axis(pixel_y)
-    z = 0.063 if action == "pick" else 0.1
+    z = 0.055 if action == "pick" else 0.13
     
     return pyniryo.PoseObject(
         x=x, y=y, z=z,
@@ -100,14 +100,14 @@ def getRobotPoseFromPixelValues(pixel_x, pixel_y, action="pick"):
         )
 
 
-def Pick(loc: Location, shift_x=0, shift_y=33):
+def Pick(loc: Location, shift_x=-19, shift_y=48):
     if not loc:
         return
     pose = getRobotPoseFromPixelValues(loc.x+shift_x, loc.y+shift_y, "pick")
     Robot.pick_from_pose(pose)
     
     
-def Place(loc:Location, shift_x=0, shift_y=33):
+def Place(loc:Location, shift_x=-19, shift_y=48):
     if not loc:
         return
     pose = getRobotPoseFromPixelValues(loc.x+shift_x, loc.y+shift_y, "place")
@@ -115,6 +115,7 @@ def Place(loc:Location, shift_x=0, shift_y=33):
 
   
 def PickAndPlace(loc1:Location, loc2:Location):
+    print("location 1 is : ", loc1, "location 2 is ", loc2)
     if not loc1 or not loc2:
         print("** One of the item was not found in the location, aborting action **")
         return
@@ -128,6 +129,7 @@ def PickAndPlace(loc1:Location, loc2:Location):
     time.sleep(1)
 
 def PickAndPlaceAll(locations: List[Location], loc2:Location):
+    
     if len(locations) == 0 or not loc2:
         print("** One of the item was not found in the location, aborting action **")
         return
@@ -142,7 +144,7 @@ def PickAndPlaceAll(locations: List[Location], loc2:Location):
     time.sleep(1)
         
     
-def MoveLeft(loc1:Location, move_value = 0.2):
+def MoveLeft(loc1:Location, move_value = 0.08):
     if not loc1:
         print("** Item was not found in the location, aborting action **")
         return
@@ -155,7 +157,7 @@ def MoveLeft(loc1:Location, move_value = 0.2):
     time.sleep(1)
 
 
-def MoveRight(loc1:Location, move_value = 0.2):
+def MoveRight(loc1:Location, move_value = 0.08):
     if not loc1:
         print("** Item was not found in the location, aborting action **")
         return
@@ -167,7 +169,7 @@ def MoveRight(loc1:Location, move_value = 0.2):
     Robot.move_to_home_pose()
     time.sleep(1)
     
-def MoveLeftAll(locations:List[Location], move_value=0.2):
+def MoveLeftAll(locations:List[Location], move_value=0.08):
     if len(locations) == 0:
         print("** One of the item was not found in the location, aborting action **")
         return
@@ -182,7 +184,7 @@ def MoveLeftAll(locations:List[Location], move_value=0.2):
     Robot.move_to_home_pose()
     time.sleep(1)
 
-def MoveRightAll(locations:List[Location], move_value =20):
+def MoveRightAll(locations:List[Location], move_value =0.08):
     if len(locations) == 0:
         print("** One of the item was not found in the location, aborting action **")
         return
