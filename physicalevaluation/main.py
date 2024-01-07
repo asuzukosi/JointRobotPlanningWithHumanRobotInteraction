@@ -3,13 +3,9 @@ import openai
 from typing import List
 
 # configure openai key and informaation
-NAGA_AI_BASE = "https://api.naga.ac/v1"
-NAGA_AI_KEY = "VN7eDdNzbkQkrmEmIr1Gj1Kci3Ed_g6a_atrW14jq6c"
+openai.api_key = "YOUR_API_KEY"
 
-openai.api_base = NAGA_AI_BASE
-openai.api_key = NAGA_AI_KEY
-
-from src.prompt import SYSTEM_PROMPT
+from physicalevaluation.prompt import SYSTEM_PROMPT
 # import function to get camera image from camera module
 from vision import *
 from actions import *
