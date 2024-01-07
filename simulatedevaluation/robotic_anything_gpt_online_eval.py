@@ -22,8 +22,7 @@ from utils.common_utils import create_logger
 
 
 
-openai.api_base = "https://api.naga.ac/v1"
-openai.api_key =  "VN7eDdNzbkQkrmEmIr1Gj1Kci3Ed_g6a_atrW14jq6c"
+openai.api_key =  ""
 
 def exception_handler(exception, logger, **kwargs):
     logger.error("Exception: {}".format(exception))
