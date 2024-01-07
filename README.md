@@ -3,21 +3,28 @@
 
 ### Table of Contents
 
-1. [Introduction](#introduction)
-2. [Objective](#objective)
-3. [Requirements](#requirements)
-4. [System Architecture](#system-architecture)
-5. [Installation](#installation)
-6. [Usage](#usage)
-7. [Examples](#examples)
-8. [Contributing](#contributing)
-9. [License](#license)
+- [Project Title: Planning robot actions using LLMs for general purpose robots](#project-title-planning-robot-actions-using-llms-for-general-purpose-robots)
+  - [Table of Contents](#table-of-contents)
+  - [1. Introduction ](#1-introduction-)
+  - [2. Objective ](#2-objective-)
+  - [3. Requirements ](#3-requirements-)
+  - [4. System Architecture ](#4-system-architecture-)
+  - [5. Installation ](#5-installation-)
+  - [6. Usage ](#6-usage-)
+  - [7. Examples ](#7-examples-)
+    - [Example 1: Task Planning](#example-1-task-planning)
 
 ---
 
 ### 1. Introduction <a name="introduction"></a>
 
-This documentation provides an overview of the LLMs (Large Language Models) for Robot Planning project. The project leverages state-of-the-art language models to enable robots to perform planning tasks more effectively and efficiently.
+This documentation provides an overview of the LLMs (Large Language Models) for Robot Planning project. The project leverages state-of-the-art language models to enable robots to perform planning tasks more effectively and efficiently by adding human feeddback to the plan generation process. The project is split into 2 parts:
+- Physical Evaluation
+- Simulated Evaluation
+
+The physical evaluation is involved with running the system on a Niryo robot arm. To run this evaluation you would need the Niryro robot arm as well as an Intel RealSense D435i image and depth camera. The robot will have to be connected to the same network as the control unit (which can be a laptop), while the camera will be physically connected to the control unit using a usb type c connection cable. Once the physical aparatus has been configured, the operator can then connect to the robot by speicfiying the robot's network ip address in the main.py file in the `physicalevaluation\` directory. 
+
+The simulated evaluation involves the use of the VimaBench which uses the pybulltet simulator, to use this evaluation, install the requirements inside the simulated evaluation folder `simulatedevaluation\requirements.txt` and set your API key in the `simulatedevaluation\visual_programming_prompt\robot_exec_generation.py` file.
 
 ### 2. Objective <a name="objective"></a>
 
@@ -31,7 +38,7 @@ To set up and run the project, you will need the following:
 - A computer with a compatible operating system (Linux, Windows, macOS)
 - Python 3.x
 - Required Python libraries (e.g., TensorFlow, PyTorch, Hugging Face Transformers)
-- Pretrained LLM model (e.g., GPT-3.5)
+- OPEN AI KEYS
 - Internet connection (for model access)
 
 ### 4. System Architecture <a name="system-architecture"></a>
@@ -82,73 +89,6 @@ Here are some examples of how to use the system:
 - User Input: "Pick up the red ball and place it on the table."
 - LLM Output: "The red ball should be picked up and placed on the table."
 - System Execution: The robot follows the instruction to pick up the red ball and place it on the table.
-
-#### Example 2: Navigation
-
-- User Input: "Go to the kitchen and check the refrigerator."
-- LLM Output: "Navigate to the kitchen area and inspect the contents of the refrigerator."
-- System Execution: The robot autonomously navigates to the kitchen and inspects the refrigerator.
-
-### 8. Contributing <a name="contributing"></a>
-
-We welcome contributions from the open-source community. If you'd like to contribute to the project, please follow our [Contribution Guidelines](CONTRIBUTING.md).
-
-### 9. License <a name="license"></a>
-
-This project is licensed under the [MIT License](LICENSE), which allows for open-source collaboration and use.
-
----
-
-Thank you for using the LLMs for Robot Planning project. If you have any questions or need assistance, please refer to the project's documentation or reach out to the project maintainers.
-
-[GitHub Repository](
-3. Obtain access to a pretrained LLM model (e.g., GPT-3.5) and set up the API credentials or connection as needed.
-
-### 6. Usage <a name="usage"></a>
-
-To use the system, follow these general steps:
-
-1. Configure the robot hardware and ensure it's connected to the system.
-
-2. Start the system, including the LLM integration, planning module, and execution module.
-
-3. Provide tasks or queries to the system in natural language.
-
-4. The LLM generates instructions, and the planning module interprets them to create high-level plans.
-
-5. The execution module translates high-level plans into low-level commands for the robot to carry out the tasks.
-
-6. Monitor and fine-tune the system's behavior as needed.
-
-### 7. Examples <a name="examples"></a>
-
-Here are some examples of how to use the system:
-
-#### Example 1: Task Planning
-
-- User Input: "Pick up the red ball and place it on the table."
-- LLM Output: "The red ball should be picked up and placed on the table."
-- System Execution: The robot follows the instruction to pick up the red ball and place it on the table.
-
-#### Example 2: Navigation
-
-- User Input: "Go to the kitchen and check the refrigerator."
-- LLM Output: "Navigate to the kitchen area and inspect the contents of the refrigerator."
-- System Execution: The robot autonomously navigates to the kitchen and inspects the refrigerator.
-
-### 8. Contributing <a name="contributing"></a>
-
-We welcome contributions from the open-source community. If you'd like to contribute to the project, please follow our [Contribution Guidelines](CONTRIBUTING.md).
-
-### 9. License <a name="license"></a>
-
-This project is licensed under the [MIT License](LICENSE), which allows for open-source collaboration and use.
-
----
-
-Thank you for using the LLMs for Robot Planning project. If you have any questions or need assistance, please refer to the project's documentation or reach out to the project maintainers.
-
-[GitHub Repository](https://github.com/your-username/robot-planning-llm)
 
 
 

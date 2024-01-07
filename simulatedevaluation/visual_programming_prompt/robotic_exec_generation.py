@@ -17,8 +17,8 @@ with open(full_prompt_file, "r") as f:
 full_prompt_i2a = "".join(full_prompt_i2a)
 
 
-openai.api_base = "https://api.naga.ac/v1"
-openai.api_key =  "VN7eDdNzbkQkrmEmIr1Gj1Kci3Ed_g6a_atrW14jq6c"
+
+openai.api_key =  ""
 # openai.api_key = "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"
 
 # this api key is only for demo, please use your own api key
