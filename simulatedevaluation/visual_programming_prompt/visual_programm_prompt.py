@@ -1,4 +1,8 @@
-PROMPT = """Think step by step to carry out the instruction.
+PROMPT = """
+Think step by step to carry out the instruction.
+You must execute all the instruction which come in this format with code based on the examples provided.
+If you make a mistake do not respond with plain text, only provide responses with the APIs provided. NO ENGLISH, JUST APIs.
+
 Instruction: Put the checkerboard round into the yellow and purple polka dot pan.
 Program:
 MASKS=SAM(image=IMAGE)
@@ -8,7 +12,6 @@ LOC0=Pixel2Loc(obj=OBJ0, masks=MASKS)
 OBJ1=CLIPRetrieval(objs=OBJS, query='the checkerboard round', obj0=OBJ0)
 LOC1=Pixel2Loc(obj=OBJ1, masks=MASKS)
 PickPlace(pick=LOC1, place=LOC0, bounds=BOUNDS)
-EXE=ROBOT()
 
 Instruction: Put the {dragged_obj} into the {base_obj}.
 Program:
@@ -19,7 +22,6 @@ LOC0=Pixel2Loc(obj=OBJ0, masks=MASKS)
 OBJ1=CLIPRetrieval(objs=OBJS, query=templates['dragged_obj'])
 LOC1=Pixel2Loc(obj=OBJ1, masks=MASKS)
 PickPlace(pick=LOC1, place=LOC0, bounds=BOUNDS)
-EXE=ROBOT()
 
 Instruction: Rotate the red letter R 150 degrees.
 Program:

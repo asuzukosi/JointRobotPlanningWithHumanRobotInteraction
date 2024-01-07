@@ -12,7 +12,6 @@ from segment_anything import (
     SamPredictor,
 )
 from PIL import Image, ImageDraw
-import clip
 import torch
 import copy
 import numpy as np
@@ -38,7 +37,7 @@ print("Loading SAM...")
 # )
 
 sam_pred_with_click = False
-sam_path = "/Users/kosisochukwuasuzu/Developer/machine_learning/llm-robotics-research/Instruct2Act/data/s2/sam_ckpt/"
+sam_path = "weights/s2/sam_ckpt/"
 sam_model = ["sam_vit_b_01ec64.pth", "sam_vit_l_0b3195.pth", "sam_vit_h_4b8939.pth"]
 build_sam_func = [build_sam_vit_b, build_sam_vit_l, build_sam_vit_h]
 sam_idx = 2  # default to use the sam_vit_h
@@ -46,7 +45,6 @@ if not sam_pred_with_click:
     mask_generator = SamAutomaticMaskGenerator(
         build_sam_func[sam_idx](
             checkpoint=os.path.join(sam_path, sam_model[sam_idx])
-            # , device=device
         )
     )
 else:
@@ -57,16 +55,16 @@ else:
     mask_generator = SamPredictor(sam)
 
 engine = "openclip"  # "openclip" or "clip"
-if engine == "clip":
-    print("Loading CLIP...")
-    model, preprocess = clip.load("ViT-L/14", device=device)
-elif engine == "openclip":
+# if engine == "clip":
+#     print("Loading CLIP...")
+#     model, preprocess = clip.load("ViT-L/14", device=device)
+if engine == "openclip":
     print("Loading OpenCLIP CLIP...")
     # add offline model for OpenCLIP
     # model, _, preprocess = open_clip.create_model_and_transforms(
     #     "ViT-H-14", device=device, pretrained="laion2b_s32b_b79k"
     # )
-    open_clip_path = "/Users/kosisochukwuasuzu/Developer/machine_learning/llm-robotics-research/Instruct2Act/data/open_clip/"
+    open_clip_path = "weights/open_clip/"
     model_cards = {
         "ViT-B-16": "ViT-B-16_openai.pt",
         "ViT-B-32": "ViT-B-32_openai.pt",
@@ -88,7 +86,6 @@ elif engine == "openclip":
         device=device,
         pretrained=os.path.join(open_clip_path, model_cards[models[clip_index]]),
     )
-    # tokenizer = open_clip.get_tokenizer("/data/openclip_tokenizer", direct_load=True)
     tokenizer = open_clip.get_tokenizer("ViT-H-14")
 
 
@@ -116,23 +113,23 @@ def retriev_openclip(elements: list[Image.Image], search_text: str) -> int:
     return probs[:, 0].softmax(dim=0)
 
 
-@torch.no_grad()
-def retriev_clip(elements: list[Image.Image], search_text: str) -> int:
-    preprocessed_images = [preprocess(image).to(device) for image in elements]
-    tokenized_text = clip.tokenize([search_text]).to(device)
-    stacked_images = torch.stack(preprocessed_images)
-    image_features = model.encode_image(stacked_images)
-    text_features = model.encode_text(tokenized_text)
-    image_features /= image_features.norm(dim=-1, keepdim=True)
-    text_features /= text_features.norm(dim=-1, keepdim=True)
-    probs = 100.0 * image_features @ text_features.T
-    return probs[:, 0].softmax(dim=0)
+# @torch.no_grad()
+# def retriev_clip(elements: list[Image.Image], search_text: str) -> int:
+#     preprocessed_images = [preprocess(image).to(device) for image in elements]
+#     tokenized_text = clip.tokenize([search_text]).to(device)
+#     stacked_images = torch.stack(preprocessed_images)
+#     image_features = model.encode_image(stacked_images)
+#     text_features = model.encode_text(tokenized_text)
+#     image_features /= image_features.norm(dim=-1, keepdim=True)
+#     text_features /= text_features.norm(dim=-1, keepdim=True)
+#     probs = 100.0 * image_features @ text_features.T
+#     return probs[:, 0].softmax(dim=0)
 
 
 def retriev_with_text(elements: list[Image.Image], search_text: str) -> int:
-    if engine == "openai":
-        return retriev_clip(elements, search_text)
-    elif engine == "openclip":
+    # if engine == "openai":
+    #     return retriev_clip(elements, search_text)
+    if engine == "openclip":
         return retriev_openclip(elements, search_text)
     else:
         raise Exception("Engine not supported")

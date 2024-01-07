@@ -1,0 +1,7 @@
+MASKS=SAM(image=IMAGE)
+OBJS, MASKS=ImageCrop(image=IMAGE, masks=MASKS)
+OBJ0=CLIPRetrieval(objs=OBJS, query='the green and purple polka dot letter M')
+LOC0=Pixel2Loc(obj=OBJ0, masks=MASKS)
+OBJ1=CLIPRetrieval(objs=OBJS, query='the tiger container', obj0=OBJ0)
+LOC1=Pixel2Loc(obj=OBJ1, masks=MASKS)
+PickPlace(pick=LOC0, place=LOC1, bounds=BOUNDS)

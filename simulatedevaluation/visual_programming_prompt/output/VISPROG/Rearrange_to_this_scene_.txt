@@ -1,0 +1,7 @@
+MASKS_OBS=SAM(image=IMAGE)
+OBJS_OBS, MASKS_OBS=ImageCrop(image=IMAGE, masks=MASKS_OBS)
+MASKS_GOAL=SAM(image=templates['scene'])
+OBJS_GOAL, MASKS_GOAL=ImageCrop(image=templates['scene'], masks=MASKS_GOAL)
+ROW, COL=get_objs_match(OBJS_GOAL, OBJS_OBS)
+DistractorActions=DistractorActions(MASKS_OBS, COL, bounds=BOUNDS)
+RearrangeActions=RearrangeActions(place_masks=MASKS_GOAL, pick_masks=MASKS_OBS, place_ind=ROW, pick_ind=COL, bounds=BOUNDS)

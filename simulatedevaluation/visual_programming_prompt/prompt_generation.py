@@ -24,9 +24,9 @@ demo_task = "Put the tiles round into the yellow and purple polka dot pan."
 full_prompt = insert_task_into_prompt(demo_task, curr_prompt)
 all_result = []
 
-response = openai.ChatCompletion.create(
-    model="gpt-3.5-turbo-0613",
-    prompt=[{"role": "user", "content": full_prompt}],
+response = openai.Completion.create(
+    engine="text-davinci-003",
+    prompt=full_prompt,
     temperature=0.99,
     max_tokens=200,
     n=1,
@@ -35,7 +35,7 @@ response = openai.ChatCompletion.create(
 
 print("For the prompt Completion, the result is: ")
 for r in range(len(response["choices"])):
-    result = response["choices"][r]["message"]["content"]
+    result = response["choices"][r]["text"]
     all_result.append(result.replace("\n\n", "") + ".")
 
 with open(txt_code_name, "w") as tfile:

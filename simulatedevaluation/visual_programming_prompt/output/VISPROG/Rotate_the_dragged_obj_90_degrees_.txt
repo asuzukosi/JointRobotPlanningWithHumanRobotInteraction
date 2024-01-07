@@ -1,0 +1,5 @@
+MASKS=SAM(image=IMAGE)
+OBJS, MASKS=ImageCrop(image=IMAGE, masks=MASKS)
+OBJ0=CLIPRetrieval(objs=OBJS, query=templates['dragged_obj'])
+LOC0=Pixel2Loc(obj=OBJ0, masks=MASKS)
+PickPlace(pick=LOC0, place=LOC0, bounds=BOUNDS, yaw_angle=90, degrees=True)

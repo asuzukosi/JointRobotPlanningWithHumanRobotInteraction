@@ -1,0 +1,5 @@
+MASKS=SAM(image=IMAGE)
+OBJS, MASKS=ImageCrop(image=IMAGE, masks=MASKS)
+OBJ0=CLIPRetrieval(OBJS, query='the red and blue stripe letter T')
+LOC0=Pixel2Loc(OBJ0, MASKS)
+PickPlace(pick=LOC0, place=LOC0, bounds=BOUNDS, yaw_angle=90, degrees=True)
