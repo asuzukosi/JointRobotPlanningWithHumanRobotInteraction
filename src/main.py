@@ -14,7 +14,7 @@ from src.prompt import SYSTEM_PROMPT
 from vision import *
 from actions import *
 
-detection_mode = "vild" # sam_clip
+detection_mode = "sam_clip" # sam_clip
 
 if detection_mode == "vild":
     from vild import *
@@ -109,6 +109,7 @@ def Instruct2ActFeedbackVild(num_iterations: int=10):
     MaxFeedback = 3
     for i in range(0, num_iterations):
         print(f"=======Iteration {i+1} ===========")
+        clearMessageStream()
         instruction = input("Enter robot command: ")
         print(f"You have enterd the instructurion '{instruction}'")
         image, _ = get_camera_image()
@@ -129,9 +130,10 @@ def Instruct2ActFeedbackVild(num_iterations: int=10):
 def Instruct2ActNoFeedbackVild(num_iterations:int=10):
     for i in range(0, num_iterations):
         print(f"=======Iteration {i+1} ===========")
+        clearMessageStream()
         instruction = input("Enter robot command: ")
         print(f"You have enterd the instructurion '{instruction}'")
-        image = get_camera_image()
+        image, _ = get_camera_image()
         scene_description = SceneDescription(image)
         print(scene_description)
         message = prepare_message(instruction, scene_description)
@@ -146,16 +148,15 @@ def Instruct2ActFeedbacKSamClip(num_iterations:int=10):
     MaxFeedback = 3
     for i in range(0, num_iterations):
         print(f"=======Iteration {i+1} ===========")
+        clearMessageStream()
         instruction = input("Enter robot command: ")
         print(f"You have enterd the instructurion '{instruction}'")
-        image = get_camera_image()
+        image, _ = get_camera_image()
         scene_description = SceneDescription(image)
         print(scene_description)
         message = prepare_message(instruction, scene_description)
         addMessage(message)
         plan = LLMPlanGenerator(instruction)
-        print("**AI GENERATED ROBOT PLAN**")
-        print(plan)
         addMessage({"role": "assistant", "content": plan})
         InstructionApproved = RequestApproval(plan)
         NumFeedback = 0
@@ -173,6 +174,7 @@ def Instruct2ActFeedbackVildNoSceneDescription(num_iterations:int = 10):
     MaxFeedback = 3
     for i in range(0, num_iterations):
         print(f"=======Iteration {i+1} ===========")
+        clearMessageStream()
         instruction = input("Enter robot command: ")
         print(f"You have enterd the instructurion '{instruction}'")
         scene_description = None
@@ -180,8 +182,6 @@ def Instruct2ActFeedbackVildNoSceneDescription(num_iterations:int = 10):
         message = prepare_message(instruction, scene_description)
         addMessage(message)
         plan = LLMPlanGenerator(instruction)
-        print("**AI GENERATED ROBOT PLAN**")
-        print(plan)
         addMessage({"role": "assistant", "content": plan})
         InstructionApproved = RequestApproval(plan)
         NumFeedback = 0
@@ -193,3 +193,5 @@ def Instruct2ActFeedbackVildNoSceneDescription(num_iterations:int = 10):
             InstructionApproved = RequestApproval(plan)
         RobotExecute(plan)
 
+
+Instruct2ActFeedbackVildNoSceneDescription()

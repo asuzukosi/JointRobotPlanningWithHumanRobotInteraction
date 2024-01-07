@@ -600,7 +600,7 @@ gpu_options
 
 
 session = tf.Session(graph=tf.Graph(), config=tf.ConfigProto(gpu_options=gpu_options))
-saved_model_dir = "/home/robotics/PythonProject/ned_lang/src/image_path_v2"
+saved_model_dir = "weights/image_path_v2"
 _ = tf.saved_model.loader.load(session, ["serve"], saved_model_dir)
 
 def display_image(path_or_array, size=(10, 10)):
@@ -736,6 +736,16 @@ def vild(image_path, category_name_string, params, plot_on=True, prompt_swaps=[]
         return found_objects
     return found_objects
 
+def bestMatch(items):
+    print(items)
+    best_score = items[0]["score"]
+    best_match = items[0]
+    for item in items:
+        if item["score"] > best_score:
+            best_score = item["score"]
+            best_match = item
+    return best_match
+
 def calculate_center_point(x, y, w, h):
     # Calculate the center point given teh bounding box values
     center_x = x + int(w/2)
@@ -786,29 +796,38 @@ def findObjectInScene(image, target_object=None):
 
 ###### -------------------------- MAIN FUNCTIONS TO BE IMPLEMENTED ARE (getObjectLocation, getAllObjectLocation) ----------------- ######
 
-def getObjectLocation(target_object):
-    image, _ = get_camera_image()
-    if target_object == "green bowl" or target_object == "green box":
-        return Location(182, 225)
-    if target_object == "blue bowl" or target_object == "green box":
-        return Location(434, 225)
+def getObjectLocation(target_object, image_path=None):
+    if not image_path:
+        raise Exception("Do not use this path, it is a dark path")
+        image, _ = get_camera_image()
+        
+    else:
+        import numpy as np
+        image = np.array(Image.open(image_path))
+
+        
+
+    if target_object == "green bowl" or target_object == "green box" or target_object=="green container":
+        return Location(251, 102)
+    if target_object == "blue bowl" or target_object == "blue box" or target_object == "blue container":
+        return Location(454, 103)
     else:
 
         item = findObjectInScene(image, target_object)
     if len(item) == 0:
         print(f"**No {target_object} found**")
         return None
-    cp =  item[0]["center_point"]
+    cp =  bestMatch(item)["center_point"]
     return Location(x=cp[0], y=cp[1])
 
 def getAllObjectLocation(*args):
     all_items = []
     image, _ = get_camera_image()
     for arg in args:
-        if arg == "green bowl" or arg == "green box":
-            return [Location(182, 225)]
-        if arg == "blue bowl" or arg == "green box":
-            return [Location(434, 225)]
+        if arg == "green bowl" or arg == "green box" or arg == "green box":
+            return [Location(251, 102)]
+        if arg == "blue bowl" or arg == "blue box" or arg == "blue container":
+            return [Location(454, 103)]
         else:
             items = findObjectInScene(image, arg)
         if len(items) == 0:
