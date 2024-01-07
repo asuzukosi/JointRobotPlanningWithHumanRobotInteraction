@@ -137,8 +137,8 @@ def SceneDescription(image):
         "content": [
             {
             "type": "text",
-            "text": "You are a robot, you are to describe the scene for robot control"/
-            ", the description should be the number of bowls, blocks, boxes and containers "/
+            "text": "You are a robot, you are to describe the scene for robot control"+
+            ", the description should be the number of bowls, blocks, boxes and containers "+
             "of various colors identified in the scene"
             },
             {

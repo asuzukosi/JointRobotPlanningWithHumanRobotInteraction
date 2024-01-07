@@ -101,7 +101,7 @@ def RequestFeedback(plan):
     addMessage({"role": "assistant", "content": plan })
     addMessage({"role": "user", "content": resp})
     
-def Instruct2ActFeedbackVild(num_iterations: int):
+def Instruct2ActFeedbackVild(num_iterations: int=10):
     """
     Implemenation of our joint robot planning with human interaction
     """
@@ -117,8 +117,6 @@ def Instruct2ActFeedbackVild(num_iterations: int):
         message = prepare_message(instruction, scene_description)
         addMessage(message)
         plan = LLMPlanGenerator(instruction)
-        print("**AI GENERATED ROBOT PLAN**")
-        print(plan)
         addMessage({"role": "assistant", "content": plan})
         InstructionApproved = RequestApproval(plan)
         NumFeedback = 0
